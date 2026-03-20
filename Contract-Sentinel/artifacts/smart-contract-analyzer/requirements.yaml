@@ -1,0 +1,18 @@
+packages:
+  "framer-motion": "For smooth page transitions, scanning animations, and micro-interactions"
+  "recharts": "For the risk score gauge visualization"
+  "lucide-react": "For beautiful icons"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility function to efficiently merge Tailwind CSS classes"
+
+images:
+  - path: "artifacts/smart-contract-analyzer/public/images/cyber-bg.png"
+    description: "Dark glowing abstract cybersecurity background, subtle hex grid, very dark navy and slate colors, low contrast"
+    aspect_ratio: "16:9"
+  - path: "artifacts/smart-contract-analyzer/public/images/logo.png"
+    description: "Minimalist glowing geometric logo for a smart contract security scanner, cyan outline on transparent background"
+    aspect_ratio: "1:1"
+
+notes:
+  - Importing hooks directly from @workspace/api-client-react as instructed
+  - Using a dark professional cybersecurity theme

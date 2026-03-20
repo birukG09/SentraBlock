@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Smart Contract Risk Analyzer"
+version = "1.0.0"
+id = "artifacts/smart-contract-analyzer"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18980
+
+[services.development]
+run = "pnpm --filter @workspace/smart-contract-analyzer run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/smart-contract-analyzer", "run", "build" ]
+publicDir = "artifacts/smart-contract-analyzer/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18980"
+BASE_PATH = "/"

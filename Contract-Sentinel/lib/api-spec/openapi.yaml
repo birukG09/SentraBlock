@@ -1,0 +1,308 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Smart Contract Risk Analyzer API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: contracts
+    description: Smart contract analysis operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /contracts/analyze:
+    post:
+      operationId: analyzeContract
+      tags: [contracts]
+      summary: Analyze a smart contract
+      description: Analyzes a smart contract for vulnerabilities and returns a risk assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeContractRequest"
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractAnalysisResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /contracts/history:
+    get:
+      operationId: getAnalysisHistory
+      tags: [contracts]
+      summary: Get analysis history
+      description: Returns a paginated list of past contract analyses
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of past analyses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisHistoryResponse"
+  /contracts/history/{id}:
+    get:
+      operationId: getAnalysisById
+      tags: [contracts]
+      summary: Get a specific analysis
+      description: Returns a specific contract analysis by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractAnalysisResult"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+    AnalyzeContractRequest:
+      type: object
+      properties:
+        address:
+          type: string
+          description: The contract address (0x...)
+        chain:
+          type: string
+          description: Blockchain network
+          enum:
+            - ethereum
+            - bsc
+            - polygon
+            - arbitrum
+            - optimism
+            - avalanche
+            - base
+      required:
+        - address
+        - chain
+    Vulnerability:
+      type: object
+      properties:
+        type:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        description:
+          type: string
+        evidence:
+          type: string
+        recommendation:
+          type: string
+      required:
+        - type
+        - severity
+        - description
+    ContractBehavior:
+      type: object
+      properties:
+        canMint:
+          type: boolean
+        upgradeable:
+          type: boolean
+        ownershipType:
+          type: string
+        hasPauseFunction:
+          type: boolean
+        hasBlacklist:
+          type: boolean
+        hasProxy:
+          type: boolean
+      required:
+        - canMint
+        - upgradeable
+        - ownershipType
+    TrustIndicators:
+      type: object
+      properties:
+        isAudited:
+          type: boolean
+        liquidityLocked:
+          type: boolean
+        contractAgedays:
+          type: integer
+        transactionCount:
+          type: integer
+        verifiedSource:
+          type: boolean
+      required:
+        - isAudited
+        - liquidityLocked
+        - contractAgedays
+        - transactionCount
+        - verifiedSource
+    AiExplanation:
+      type: object
+      properties:
+        overview:
+          type: string
+        riskReasoning:
+          type: string
+        userFriendlySummary:
+          type: string
+      required:
+        - overview
+        - riskReasoning
+        - userFriendlySummary
+    ContractAnalysisResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        address:
+          type: string
+        chain:
+          type: string
+        riskScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        riskLevel:
+          type: string
+          enum: [low, medium, high]
+        summary:
+          type: string
+        vulnerabilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Vulnerability"
+        behavior:
+          $ref: "#/components/schemas/ContractBehavior"
+        trustIndicators:
+          $ref: "#/components/schemas/TrustIndicators"
+        aiExplanation:
+          $ref: "#/components/schemas/AiExplanation"
+        recommendations:
+          type: array
+          items:
+            type: string
+        analyzedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - address
+        - chain
+        - riskScore
+        - riskLevel
+        - summary
+        - vulnerabilities
+        - behavior
+        - trustIndicators
+        - aiExplanation
+        - recommendations
+        - analyzedAt
+    AnalysisHistoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        address:
+          type: string
+        chain:
+          type: string
+        riskScore:
+          type: number
+        riskLevel:
+          type: string
+          enum: [low, medium, high]
+        summary:
+          type: string
+        analyzedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - address
+        - chain
+        - riskScore
+        - riskLevel
+        - summary
+        - analyzedAt
+    AnalysisHistoryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalysisHistoryItem"
+        total:
+          type: integer
+      required:
+        - items
+        - total
