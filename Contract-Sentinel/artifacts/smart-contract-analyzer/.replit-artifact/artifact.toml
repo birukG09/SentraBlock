@@ -3,7 +3,7 @@ previewPath = "/"
 title = "Smart Contract Risk Analyzer"
 version = "1.0.0"
 id = "artifacts/smart-contract-analyzer"
-router = "paths"
+router = "path s"
 
 [[integratedSkills]]
 name = "react-vite"
